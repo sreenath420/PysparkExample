@@ -1,0 +1,44 @@
+i/p
+
++----------+---------+------+
+|first_name|last_name|salary|
++----------+---------+------+
+|      John|    Smith| 20000|
+|       Ava|   Ninson| 10000|
+|    Cailin|    Smith| 30000|
+|      Mike| Peterson| 20000|
+|       Ian| Peterson| 80000|
+|      John|    Mills| 50000|
++----------+---------+------+
+
+o/p-
+
++----------+---------+------+---+
+|first_name|last_name|salary| sa|
++----------+---------+------+---+
+|      John|    Smith| 20000|  2|
+|      Mike| Peterson| 20000|  2|
++----------+---------+------+---+
+
+
+from pyspark.sql.types import StructType,StructField, StringType, IntegerType
+data=[("John","Smith",20000),
+      ("Ava","Ninson",10000),
+	  ("Cailin","Smith",30000),
+	  ("Mike","Peterson",20000),
+   ("Ian","Peterson",80000),
+   ("John","Mills",50000)]
+   
+schema = StructType([
+       StructField("first_name",StringType(),True), \
+	   StructField("last_name",StringType(),True), \
+	   StructField("salary",IntegerType(),True)])
+
+df = spark.createDataFrame(data=data,schema=schema)
+df.printSchema()       
+solution-
+from pyspark.sql.window import Window
+from pyspark.sql.functions import dense_rank
+window=Window.orderBy("salary")
+window_df=df.withColumn("sa",dense_rank().over(window))
+df_final=window_df.filter("sa=2").show()
