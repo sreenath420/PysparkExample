@@ -66,3 +66,55 @@ df_filter=df2_group.select("ActorID","Directorid").filter(df2_group['count']>2).
 +-------+----------+
 |      1|         1|
 +-------+----------+
+
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+i/p-------------------------
+
++---------+---------+
+|StudentID|ClassName|
++---------+---------+
+|        A|     Math|
+|        B|  English|
+|        C|     Math|
+|        D|  Biology|
+|        E|     Math|
+|        F| Computer|
+|        G|     Math|
+|        H|     Math|
+|        I|     Math|
++---------+---------+
+
+o/p-------------------------
++---------+-----+
+|ClassName|count|
++---------+-----+
+|     Math|    6|
++---------+-----+
+
+from pyspark.sql.types import StructType,StructField, StringType, IntegerType
+data = [
+('A', 'Math'),
+('B', 'English'),
+('C', 'Math'),
+('D', 'Biology'),
+('E', 'Math'),
+('F', 'Computer'),
+('G', 'Math'),
+('H', 'Math'),
+('I', 'Math')]
+
+schema = StructType([
+StructField ("StudentID", StringType(), True),\
+StructField ("ClassName", StringType(), True)
+])
+
+df = spark.createDataFrame(data=data,schema=schema)
+df.show()
+
+df.createOrReplaceTempView("df_view")
+---------------------------------------------------------------spark sql-----------------------------------------------------------------
+df=spark.sql("""select ClassName,count(StudentId) as count From df_view group by ClassName having count(StudentID)> 4""")
+-----------------------------------------------------------------pyspark---------------------------------------------------------------
+from pyspark.sql.functions import *
+df3=df.groupBy("ClassName").count()
+df3.filter("count > 4").show()
