@@ -1,0 +1,42 @@
+I/p
+-+-------+---+
+|   Name|Age|
++-------+---+
+|  Alice| 30|
+|    Bob| 25|
+|Charlie| 35|
++-------+---+
+
+o/p-
++-------+---+------------+
+|   Name|Age|age_category|
++-------+---+------------+
+|  Alice| 30| Middle-aged|
+|    Bob| 25|  Young-aged|
+|Charlie| 35| Middle-aged|
++-------+---+------------+
+
+from pyspark.sql.types import StructType,StructField, StringType, IntegerType
+data=[("Alice",30),("Bob",25),("Charlie",35)]
+
+schema = StructType([
+StructField ("Name", StringType(), True),\
+StructField ("Age", IntegerType(), True)
+])
+
+df=spark.createDataFrame(data=data,schema=schema)
+
+df.createOrReplaceTempView("df_view")
+
+df=spark.sql("""select Name, Age
+             from df_view """)
+			 
+df=spark.sql("""select Name, Age, case 
+             when  Age < '30' then 'Young-aged'
+             else 'Middle-aged'
+             end as age_category
+             from df_view """)
+
+from pyspark.sql.functions import *
+df1=df.withColumn("age_category",when(df.Age < 30,"young").when((col("Age") >= 30) & (col("Age") < 40),"middle").otherwise("old"))
+df1.show()			 
