@@ -7,4 +7,5 @@
 
 2.Handling null Values
 
+3.Removing spaces
 
