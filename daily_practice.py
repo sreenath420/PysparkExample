@@ -39,8 +39,7 @@ df2=df.select(countDistinct("category").alias("DistinctCategory"))
 df2.show()
 
 
---------------------------------------------------------------------------------------------------------------------------------------------------
-
+-------------------------------------------------------------------------------------------------------------------------------------
 Question: Given a DataFrame with columns FirstName and LastName, create a new column FullName by concatenating FirstName and LastName with a space
 in between. Handle null values by excluding them from the concatenation.
 Input :
@@ -80,3 +79,39 @@ df2=df.withColumn("firstname",when(col("firstname")=="null",None).otherwise(col(
 
 df3=df2.withColumn("fullname",concat_ws(' ',col('firstname'),col('lastname')))
 df3.show()
+
+-------------------------------------------------------removing spaces---------------------------------------------------------------------------
+3.Regression Replace
+input-
++----------------------+
+|Full_name             |
++----------------------+
+|Sreenath  Gooty       |
+|Chandrakant  Narayan  |
+|  Siva  Kumar Pillai  |
++----------------------+
+
++--------------------+
+
+output-
++-------------------+
+|    normalized_name|
++-------------------+
+|           Sreenath|
+|Chandrakant Narayan|
+|  Siva Kumar Pillai|
++-------------------+
+
+from pyspark.sql.types import StructType,StructField,StringType,IntegerType
+from pyspark.sql.functions import *
+schema=StructType([
+StructField("Full_name",StringType(),True)])
+
+df=spark.createDataFrame(data=data1,schema=schema)
+df_cleaned = df.withColumn("cleaned_name", regexp_replace(trim(df["Full_name"]), "\\s+", " "))
+df_cleaned.show()
+
+df1=spark.sql("""SELECT 
+REGEXP_REPLACE(TRIM(Full_name), ' +', ' ') AS normalized_name
+FROM df_view """)
+df1.show()
