@@ -9,3 +9,8 @@
 
 3.Removing spaces
 
+4.Explode function
+
+5.even numbers
+
+6.word count 
