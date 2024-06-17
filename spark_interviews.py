@@ -85,3 +85,81 @@ sum(case when sub='Eng' then mark end) as Eng
 from df_stud
 group by name """)
 df2.show()
+------------------------------------different rows----------------------------------------------------------
++----+------+-------------+
+|  id|  name|        score|
++----+------+-------------+
+|1111|sachin|[60, 120, 80]|
++----+------+-------------+
+
+
++----+------+---+
+|  id|  name|col|
++----+------+---+
+|1111|sachin| 60|
+|1111|sachin|120|
+|1111|sachin| 80|
++----+------+---+
+
+
+from pyspark.sql.types import StructType,StructField, StringType, IntegerType, ArrayType
+data = [(1111, 'sachin', [60, 120, 80])]
+schema=StructType([
+StructField("id",IntegerType(),True),\
+StructField("name",StringType(),True),\
+StructField("score", ArrayType(IntegerType()),True),\
+])
+df=spark.createDataFrame(data=data,schema=schema)
+df.show()
+
+------------------------even numbers-------------------------------------------
+input-
++---+
+| id|
++---+
+|  1|
+|  2|
+|  3|
+|  4|
+|  5|
+|  6|
++---+
+output-
++---+
+| id|
++---+
+|  2|
+|  4|
+|  6|
++---+
+
+from pyspark.sql.types import StructType,StructField, StringType, IntegerType, ArrayType
+data = [(1,), (2,), (3,), (4,), (5,), (6,)]
+schema=StructType([
+StructField("id",IntegerType(),True),\
+
+])
+df=spark.createDataFrame(data=data,schema=schema)
+df.show()
+
+df1=df.filter(col("id")%2==0)
+df1.show()
+--------------------------word count------------------------------------------
+Input-
+This is SreeNath
+This is Ujjwala
+Output-
+(This,2)
+(is,2)
+(SreeNath,1)
+(Ujjwala,1)
+data = ["This is SreeNath", "This is Ujjwala"]
+rdd =sc.parallelize(data)
+counts=rdd.flatMap(lambda line: line.split(" ")) \
+                            .map(lambda word: (word, 1)) \
+                           .reduceByKey(lambda x, y: x + y)
+##word_tuples_rdd.reduceByKey(lambda a, b: a + b)
+
+counts.collect()
+[('This', 2), ('SreeNath', 1), ('is', 2), ('Ujjwala', 1)]   
+   
