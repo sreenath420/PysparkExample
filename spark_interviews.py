@@ -163,3 +163,64 @@ counts=rdd.flatMap(lambda line: line.split(" ")) \
 counts.collect()
 [('This', 2), ('SreeNath', 1), ('is', 2), ('Ujjwala', 1)]   
    
+--------------------------------------------------------------------
+      +----+-----+----+
+|item|sales|date|
++----+-----+----+
+| 123|  100|1/31|
+| 123|   50|1/29|
+| 456|   50|1/31|
++----+-----+----+
+
++----+------------------+-------------------+
+|item|collect_list(date)|collect_list(sales)|
++----+------------------+-------------------+
+| 123|      [1/31, 1/29]|          [100, 50]|
+| 456|            [1/31]|               [50]|
++----+------------------+-------------------+
+
+
+from pyspark.sql.types import StructType,StructField, StringType, IntegerType, ArrayType
+data = [(123,100,'1/31'),\
+        (123,50,'1/29'),\
+        (456,50,'1/31')]
+schema=StructType([
+StructField("item",IntegerType(),True),\
+StructField("sales",IntegerType(),True),\
+  StructField("date",StringType(),True),\
+])
+df=spark.createDataFrame(data=data,schema=schema)
+df.show()
+
+from pyspark.sql.functions import *
+df1 = df.groupBy("item").agg(collect_list("date"),collect_list("sales"))
+df1.show()
+
+
+
++----+-------+------+
+|item| buyer1|buyer2|
++----+-------+------+
+| 123|Richard|Satish|
++----+-------+------+
+
++----+-------+
+|item| buyer1|
++----+-------+
+| 123|Richard|
+| 123| Satish|
++----+-------+
+
+from pyspark.sql.types import StructType,StructField, StringType, IntegerType, ArrayType
+data = [(123,'Richard','Satish')]
+schema=StructType([
+StructField("item",IntegerType(),True),\
+StructField("buyer1",StringType(),True),\
+  StructField("buyer2",StringType(),True)
+])
+df=spark.createDataFrame(data=data,schema=schema)
+df.show()
+
+from pyspark.sql.functions import *
+df1 = df.select('item','buyer1').union(df.select('item','buyer2'))
+df1.show()
