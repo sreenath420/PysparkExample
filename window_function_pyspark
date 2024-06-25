@@ -119,4 +119,44 @@ df2.show()
 
 
 
-
+--------><----------------------------
+Input-
++----------+--------+------+
+|Department|Employee|Salary|
++----------+--------+------+
+|        IT|    John|  6000|
+|        IT|    Jake|  7000|
+|        IT|   Linda|  6500|
+|        HR|   Alice|  4500|
+|        HR|   David|  4800|
+|        HR|   Chris|  4600|
++----------+--------+------+
+Output-
++----------+--------+------+---+
+|Department|Employee|Salary| ok|
++----------+--------+------+---+
+|        HR|   David|  4800|  1|
+|        HR|   Chris|  4600|  2|
+|        IT|    Jake|  7000|  1|
+|        IT|   Linda|  6500|  2|
++----------+--------+------+---+
+from pyspark.sql.types import StructType,StructField, StringType, IntegerType
+data=[("IT","John",6000),
+      ("IT","Jake",7000),
+	  ("IT","Linda",6500),
+	  ("HR","Alice",4500),
+   ("HR","David",4800),
+   ("HR","Chris",4600),
+   ]
+schema=StructType([
+StructField("Department",StringType(),True),\
+StructField("Employee",StringType(),True),\
+  StructField("Salary",IntegerType(),True)
+])
+df=spark.createDataFrame(data=data,schema=schema)
+from pyspark.sql.window import Window
+from pyspark.sql.functions import *
+window=Window.partitionBy("Department").orderBy(col("Salary").desc())
+window_df=df.withColumn("ok",dense_rank().over(window))
+df1=window_df.filter("ok<3")
+df1.show()
