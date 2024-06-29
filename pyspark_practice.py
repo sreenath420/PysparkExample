@@ -118,3 +118,28 @@ df=spark.sql("""select ClassName,count(StudentId) as count From df_view group by
 from pyspark.sql.functions import *
 df3=df.groupBy("ClassName").count()
 df3.filter("count > 4").show()
+
+---------------------------------------------------->json with explode<----------------------------------------------------------
+input:-
+{"dept_id":101,"e_id":[10101,10102,10103]}
+{"dept_id":102,"e_id":[10101,10102]}
+
+output:-
+
++-------+------+
+|dept_id|e_maid|
++-------+------+
+|    101| 10101|
+|    101| 10102|
+|    101| 10103|
+|    102| 10101|
+|    102| 10102|
++-------+------+
+
+
+df=spark.read.json("dbfs:/FileStore/import-stage/json_file.json")
+
+from pyspark.sql.functions import *
+df_explode=df.select("dept_id",explode("e_id")).alias('e_maid')
+df_explode.show()
+
