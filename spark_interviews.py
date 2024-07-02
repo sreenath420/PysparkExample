@@ -224,3 +224,49 @@ df.show()
 from pyspark.sql.functions import *
 df1 = df.select('item','buyer1').union(df.select('item','buyer2'))
 df1.show()
+
+
+---------------------------------------------------------------> flattend nested json in pyspark <--------------------------------------------------------------------
+
+
+
+df=spark.read.format("json").option("multiLine",True).\
+  option("header",True).option("inferSchema",True).\
+    load("dbfs:/FileStore/nested_json.json")
+df.show(truncate=False)
+
+
+
++-------------------+---+----+--------------------------------------------+
+|address            |id |name|phone_numbers                               |
++-------------------+---+----+--------------------------------------------+
+|{New York, NY}     |1  |John|[{123-456-7890, home}, {987-654-3210, work}]|
+|{San Francisco, CA}|2  |Jane|[{555-1234, mobile}, {777-4321, work}]      |
++-------------------+---+----+--------------------------------------------+
+
+
+
+
+from pyspark.sql.functions import col,explode
+df1=df.select(col('id'),col('name'),col('address.city').alias('city'),col('address.state').alias('state'),
+          explode(col('phone_numbers')).alias('phone'))
+df1.show()
+
++---+----+-------------+-----+--------------------+
+| id|name|         city|state|               phone|
++---+----+-------------+-----+--------------------+
+|  1|John|     New York|   NY|{123-456-7890, home}|
+|  1|John|     New York|   NY|{987-654-3210, work}|
+|  2|Jane|San Francisco|   CA|  {555-1234, mobile}|
+|  2|Jane|San Francisco|   CA|    {777-4321, work}|
+
+ 
+ df2=df1.select(col('id'),col('name'),col('city'),col('state'),col('phone.type').alias('phone_type'),col('phone.number').alias('phone_number'))
++---+----+-------------+-----+----------+------------+
+| id|name|         city|state|phone_type|phone_number|
++---+----+-------------+-----+----------+------------+
+|  1|John|     New York|   NY|      home|123-456-7890|
+|  1|John|     New York|   NY|      work|987-654-3210|
+|  2|Jane|San Francisco|   CA|    mobile|    555-1234|
+|  2|Jane|San Francisco|   CA|      work|    777-4321|
++---+----+-------------+-----+----------+------------+
