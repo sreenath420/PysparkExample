@@ -235,6 +235,9 @@ df=spark.read.format("json").option("multiLine",True).\
     load("dbfs:/FileStore/nested_json.json")
 df.show(truncate=False)
 
+what is option("multiLine",True) ?
+To read JSON files that span multiple lines in PySpark, you can use the multiline option. 
+This is useful for reading JSON files that are pretty-printed or contain nested structures.
 
 
 +-------------------+---+----+--------------------------------------------+
@@ -270,3 +273,5 @@ df1.show()
 |  2|Jane|San Francisco|   CA|    mobile|    555-1234|
 |  2|Jane|San Francisco|   CA|      work|    777-4321|
 +---+----+-------------+-----+----------+------------+
+
+
