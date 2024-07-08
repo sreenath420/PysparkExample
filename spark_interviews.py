@@ -299,3 +299,32 @@ df.show(truncate=False)
 from pyspark.sql.functions import * 
 df1=df.select(col('dept_id'),explode(col("e_id")).alias("emp_id"))
 df1.show()
+
+--------------------------------------------------------------->read stream data<------------------------------------------------------
+
+Convert the below line(consider this is your csv/txt file data) into a dataframe with 4 columns
+input
+emp1|20000|BA|BIGDATA|emp2|30000|BE|JAVA|emp3|40000|BE|TESTE
+
+output
+
+Name	Salary	Degree	Skill
+emp1	20000	BA	BIGDATA
+emp2	30000	BE	JAVA
+emp3	40000	BE	TESTE
+
+from pyspark.sql.functions import  *
+from pyspark.sql.types import * 
+data = "emp1|20000|BA|BIGDATA|emp2|30000|BE|JAVA|emp3|40000|BE|TESTE"
+data_list=data.split('|')
+data_reshaped=[data_list[i:i+4] for i in range(0,len(data_list),4)]
+
+rdd = spark.sparkContext.parallelize(data_reshaped)
+schema=StructType([StructField('employee',StringType(),True),
+                   StructField('salary',StringType(),True),
+                   StructField('cat',StringType(),True),
+                   StructField('Tech',StringType(),True)])
+
+df=spark.createDataFrame(rdd,schema)
+
+df.show()
