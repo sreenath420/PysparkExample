@@ -328,3 +328,31 @@ schema=StructType([StructField('employee',StringType(),True),
 df=spark.createDataFrame(rdd,schema)
 
 df.show()
+
+------------------------------------------------->max score of student in subject <--------------------------------------------------------
+max marks of each student 
+student table
+
+student_name  maths  sciences   englies
+
+a             90      85          60
+b             56      89          67
+
+
+
+  max_score
+      90
+      89
+
+
+  from pyspark.sql.functions import greatest
+data = [
+    ("a", 90, 85, 60),
+    ("b", 56, 89, 67)
+]
+columns=['studnet_name','maths','sciences','english']
+df=spark.createDataFrame(data,schema=columns)
+
+
+df_max=df.withColumn('max_score',greatest('maths','sciences','english'))
+df_max.show()
