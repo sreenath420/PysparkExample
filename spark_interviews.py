@@ -356,3 +356,35 @@ df=spark.createDataFrame(data,schema=columns)
 
 df_max=df.withColumn('max_score',greatest('maths','sciences','english'))
 df_max.show()
+
+--------------------------------->emp_intial_letter<--------------------------------------------
+
+empid,   fname,  lname,  mgrid,  deptid,    salary
+10,Kamal,        Kant,            20,     10,       10000
+20,Rajesh,Das,,10,5000
+30,Komal,kumar,20,20,3000
+40,Ranjan,Desai,30,20,1000
+50,Mohan,Kumar,20,20,6000
+ output
+initial count
+KK       2
+RD       2
+MK       1
+from pyspark.sql.functions import *
+employee_data = [
+    (10, 'Kamal', 'Kant', 20, 10, 10000),
+    (20, 'Rajesh', 'Das', None, 10, 5000),
+    (30, 'Komal', 'Kumar', 20, 20, 3000),
+    (40, 'Ranjan', 'Desai', 30, 20, 1000),
+    (50, 'Mohan', 'Kumar', 20, 20, 6000)
+]
+
+# Define schema for employees
+employee_schema = ["empid", "fname", "lname", "mgrid", "deptid", "salary"]
+
+# Create DataFrame
+employee_df = spark.createDataFrame(employee_data, schema=employee_schema)
+employee_df.show()
+df=employee_df.withColumn('new_count',concat_ws("",substring(col('fname'),1,1),substring(col('lname'),1,1)))
+df1=df.groupBy('new_count').count()
+df1.show()
