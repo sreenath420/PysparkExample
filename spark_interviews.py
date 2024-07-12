@@ -422,3 +422,30 @@ df_numeric="^[0-9]+$"
 df = df.withColumn("output", when(regexp_extract(col("salary"), df_numeric, 0) == "", 0).otherwise(col('salary').cast('integer')))
 
 
+
+
+----------------------------->Employees Earning More than Managers<--------------------------------------------
+
+  data = [
+    (1, "Joe", 70000, 3),
+    (2, "Henry", 80000, 4),
+    (3, "Sam", 60000, None),
+    (4, "Max", 90000, None)
+]
+
+# Define the schema
+columns = ["Id", "Name", "Salary", "ManagerId"]
+output:
++----+
+|Name|
++----+
+| Joe|
++----+
+
+df=spark.createDataFrame(data,columns)
+from pyspark.sql.functions import col
+joindf=df.alias('employee').join(df.alias('manager'),col("employee.ManagerId")==col('manager.Id'),'inner')
+df=joindf.filter(col("employee.Salary")>col("manager.Salary"))
+df.select('employee.Name').show()
+
+
