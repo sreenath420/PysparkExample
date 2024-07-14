@@ -42,3 +42,70 @@ df_result=df.join(df1,df.dept==df1.dept,"inner")
 df_result.show()
 df2=df_result.filter(df.salary > df1.average_salary)
 df2.show()
+
+
+------------------------------------------------------------>DataFrame<-------------------------------------------------------------
+
+df1 = spark.createDataFrame([
+ (1, "Smith", 2018, 10, "M", 3000),
+ (2, "Rose", 2010, 20, "M", 4000),
+ (3, "Williams", 2010, 20, "M", 1000),
+ (4, "Jones", 2005, 10, "F", 2000),
+ (5, "Brown", 2010, 40, None, -1),
+ (6, "Brown", 2010, 50, None, -1)
+], ["emp_id", "name", "year_joined", "emp_dept_id", "gender", "salary"])
+
+df2 = spark.createDataFrame([
+ ("Finance", 10),
+ ("Marketing", 20),
+ ("Sales", 30),
+ ("IT", 40)], ["dept_name", "dept_id"])
+
+# Q1: Get name and dept_name from these 2 tables
+joined_df = df1.join(df2, df1.emp_dept_id == df2.dept_id, "inner")
+result_q1 = joined_df.select("name", "dept_name")
+result_q1.show()
++--------+---------+
+|    name|dept_name|
++--------+---------+
+|   Smith|  Finance|
+|   Jones|  Finance|
+|    Rose|Marketing|
+|Williams|Marketing|
+|   Brown|       IT|
++--------+---------+
+
+# Q2: Get highest salary from each dept
+
+from pyspark.sql.functions import *
+df_max=joined_df.groupBy('dept_name').agg(max('salary'))
+df_max.show()
+
++---------+-----------+
+|dept_name|max(salary)|
++---------+-----------+
+|  Finance|       3000|
+|Marketing|       4000|
+|       IT|         -1|
++---------+-----------+
+
+# Q3: Get a new column gender_full
+
+df1_with_gender_full=df1.withColumn("gender_full", 
+ when(col("gender") == "M", "Male")
+ .when(col("gender") == "F", "Female")
+ .otherwise("Unknown"))
+
+df1_with_gender_full.show()
+
++------+--------+-----------+-----------+------+------+-----------+
+|emp_id|    name|year_joined|emp_dept_id|gender|salary|gender_full|
++------+--------+-----------+-----------+------+------+-----------+
+|     1|   Smith|       2018|         10|     M|  3000|       Male|
+|     2|    Rose|       2010|         20|     M|  4000|       Male|
+|     3|Williams|       2010|         20|     M|  1000|       Male|
+|     4|   Jones|       2005|         10|     F|  2000|     Female|
+|     5|   Brown|       2010|         40|  null|    -1|    Unknown|
+|     6|   Brown|       2010|         50|  null|    -1|    Unknown|
++------+--------+-----------+-----------+------+------+-----------+
+
