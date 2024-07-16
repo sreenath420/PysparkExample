@@ -1,3 +1,4 @@
+------------------------------------------------->1.Piovt_Using<-----------------------------------------------------
 id name amout
 1  A   30
 1  B   80
@@ -35,7 +36,7 @@ pivot_df = pivot_df.fillna(0)
 pivot_df.show()
 
 
----------------------------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------2------------------------------------------------------------
 
 Input-
 
@@ -85,7 +86,7 @@ sum(case when sub='Eng' then mark end) as Eng
 from df_stud
 group by name """)
 df2.show()
-------------------------------------different rows explode using----------------------------------------------------------
+------------------------------------3.different rows explode using----------------------------------------------------------
 +----+------+-------------+
 |  id|  name|        score|
 +----+------+-------------+
@@ -112,7 +113,7 @@ StructField("score", ArrayType(IntegerType()),True),\
 df=spark.createDataFrame(data=data,schema=schema)
 df.show()
 
-------------------------even numbers-------------------------------------------
+----------------------------------------4.even numbers-------------------------------------------
 input-
 +---+
 | id|
@@ -144,7 +145,7 @@ df.show()
 
 df1=df.filter(col("id")%2==0)
 df1.show()
---------------------------word count------------------------------------------
+--------------------------..................5.word count------------------------------------------
 Input-
 This is SreeNath
 This is Ujjwala
@@ -163,7 +164,7 @@ counts=rdd.flatMap(lambda line: line.split(" ")) \
 counts.collect()
 [('This', 2), ('SreeNath', 1), ('is', 2), ('Ujjwala', 1)]   
    
---------------------------------------------------------------------
+----------------------------------------------------------------->6.Collect_list<-----------------------------------------------------
  Input     +----+-----+----+----------------------------
 |item|sales|date|
 +----+-----+----+
@@ -197,7 +198,7 @@ df1 = df.groupBy("item").agg(collect_list("date"),collect_list("sales"))
 df1.show()
 
 
---------------------------------------------------------------------------------------------------------
+-----------------------------------------------------------------7.using union---------------------------------------
 +----+-------+------+
 |item| buyer1|buyer2|
 +----+-------+------+
@@ -226,7 +227,7 @@ df1 = df.select('item','buyer1').union(df.select('item','buyer2'))
 df1.show()
 
 
----------------------------------------------------------------> flattend nested json in pyspark <--------------------------------------------------------------------
+--------------------------------------------------------------->8. flattend nested json in pyspark <--------------------------------------------------------------------
 
 
 
@@ -276,7 +277,7 @@ df1.show()
 
 
 
----------------------------------------------------------------> explode function in json using pyspark <--------------------------------------------------------------------
+---------------------------------------------------------------> 9.explode function in json using pyspark <--------------------------------------------------------------------
 Input-
 +-------+---------------------+
 |dept_id|e_id                 |
@@ -300,7 +301,7 @@ from pyspark.sql.functions import *
 df1=df.select(col('dept_id'),explode(col("e_id")).alias("emp_id"))
 df1.show()
 
---------------------------------------------------------------->read stream data<------------------------------------------------------
+--------------------------------------------------------------->10.read stream data<------------------------------------------------------
 
 Convert the below line(consider this is your csv/txt file data) into a dataframe with 4 columns
 input
@@ -329,7 +330,7 @@ df=spark.createDataFrame(rdd,schema)
 
 df.show()
 
-------------------------------------------------->max score of student in subject <--------------------------------------------------------
+------------------------------------------------->11.max score of student in subject <--------------------------------------------------------
 max marks of each student 
 student table
 
@@ -357,7 +358,7 @@ df=spark.createDataFrame(data,schema=columns)
 df_max=df.withColumn('max_score',greatest('maths','sciences','english'))
 df_max.show()
 
---------------------------------->emp_intial_letter<--------------------------------------------
+--------------------------------->12.emp_intial_letter<--------------------------------------------
 
 empid,   fname,  lname,  mgrid,  deptid,    salary
 10,Kamal,        Kant,            20,     10,       10000
@@ -390,7 +391,7 @@ df1=df.groupBy('new_count').count()
 df1.show()
 
 
----------------------------->convert string values to numeric in pyspark<------------------------------------------
+---------------------------->13.convert string values to numeric in pyspark<------------------------------------------
 --->input<----
 +------+
 |salary|
@@ -424,7 +425,7 @@ df = df.withColumn("output", when(regexp_extract(col("salary"), df_numeric, 0) =
 
 
 
------------------------------>Employees Earning More than Managers<--------------------------------------------
+----------------------------->14.Employees Earning More than Managers<--------------------------------------------
 
   data = [
     (1, "Joe", 70000, 3),
@@ -447,5 +448,85 @@ from pyspark.sql.functions import col
 joindf=df.alias('employee').join(df.alias('manager'),col("employee.ManagerId")==col('manager.Id'),'inner')
 df=joindf.filter(col("employee.Salary")>col("manager.Salary"))
 df.select('employee.Name').show()
+
+------------------------------------->15.Joining two dataframe<------------------------------------------
+
+  ------------------------------------------>df1=FlightDetail<------------------------------ 
+Origin	Destination		FlightID
+O1				D1		1,2
+O2				D2		3,4
+O3				D3		5
+ 	 	 
+--------------------------------------------------->df2=FlightMaster<----------------------------- 
+FlightID	FlightName	 
+1				F1	 
+2				F2	 
+3				F3	 
+4				F4
+
+output
++------+-----------+--------------------------------------+
+|Origin|Destination|FlightName                            |
++------+-----------+--------------------------------------+
+|    O1|         D1|                                 F1,F2|
+|    O2|         D2|                                 F3,F4|
+|    O3|         D3|                                      |
++------+-----------+--------------------------------------+
+
+
+------------------------------------------------>16.pyspark_code<---------------------------
+
+from pyspark.sql.functions import *
+df1 = spark.createDataFrame([
+    (("O1", "D1", "1,2")),
+    (("O2", "D2", "3,4")),
+    (("O3", "D3", "5"))
+], ["Origin", "Destination", "FlightID"])
+
+# df2 - FlightMaster
+df2 = spark.createDataFrame([
+    ((1, "F1")),
+    ((2, "F2")),
+    ((3, "F3")),
+    ((4, "F4"))
+], ["FlightID", "FlightName"])
+df1=df1.withColumn('FlightID',explode(split(df1['FlightID'],',')))
+df_joined=df1.join(df2,df1.FlightID==df2.FlightID,'left')
+df_group=df_joined.groupBy('Origin','Destination').agg(concat_ws(',',collect_list('FlightName')))
+
+
+Note:-
+--------------------------------------------------->split<------------------------------------------------------
+The split function in PySpark is used to split a string column in a DataFrame into multiple columns
+syntax:
+split(str, pattern, limit=-1)
+example
+df.withColumn('lastname_array', split(col('lastname'), ''))
+
+--------------------------------------------------->explode<-----------------------------------------------------
+The explode function in Apache Spark is used to convert an array or map column in a DataFrame into multiple rows, where each row represents an element 
+in the array or a key-value pair in the map. Here are the key points and examples to help you understand how to use the explode function in PySpark.
+Function: explode(array_or_map)
+example
+df_exploded = df.select(df["name"], explode(df["knownLanguages"]).alias("language"))
+
+-------------------------------------------------->concat_ws<---------------------------------------------------------
+The concat_ws function in PySpark is used to concatenate multiple columns with a user-specified separator.
+
+Function: concat_ws(sep, *cols)
+ex
+
+df_concat = df.withColumn("fullname", concat_ws(" ", "firstname", "lastname"))
+
+------------------------------------------------->collect_list<--------------------------------------------
+
+The collect_list function in PySpark is used to collect all the values from a column into a single array. 
+Function: collect_list(col)
+example:-
+df_with_list = df.groupBy("id").agg(collect_list("fruit").alias("fruits"))
+
+
+
+
 
 
