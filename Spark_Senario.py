@@ -71,3 +71,27 @@ df=df.withColumn('laste_email_id',dense_rank().over(spec))
 final=df.filter(col('laste_email_id')==1).drop('laste_email_id')
 # Show the final DataFrame
 final.show()
+
+---------------------------------------------->fetch the details of employees who are reporting to the same manager<------------------------------------------------
+
+     data = [
+ (1,'A',4),
+ (2,'B',5),
+ (3,'C',6),
+ (4,'D',5),
+ (5,'E',None),
+ (6,'F',None),
+ ]
+----->output<----
+|empid|empname|
++-----+-------+
+|    2|      B|
+|    4|      D|
++-----+--------
+  
+schema = ['empid','empname','mgrid']
+emp_df = spark.createDataFrame(data,schema)
+from pyspark.sql.functions import *
+df=emp_df.groupBy('mgrid').agg(count('mgrid').alias('cnt')).filter(col('cnt')>1)
+df1=df.join(emp_df,df.mgrid==emp_df.mgrid,'inner')
+df1.show()
