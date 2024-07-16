@@ -14,3 +14,7 @@
 5.even numbers
 
 6.word count 
+
+--------------------------------------------->Spark_Senario.py<---------------------------------------------------
+
+2.fetch the details of employees who are reporting to the same manager.
