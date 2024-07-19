@@ -3,7 +3,7 @@
 
 input
 +---+-----+-----------------+-------------------+
-| id| name|            email|        update_date|
+| id| name|            email|        update_date
 +---+-----+-----------------+-------------------+
 |  1| john| john@example.com|2023-09-01 10:30:00|
 |  2| jane| jane@example.com|2023-09-02 15:45:00|
