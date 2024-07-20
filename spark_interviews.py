@@ -112,7 +112,7 @@ StructField("score", ArrayType(IntegerType()),True),\
 ])
 df=spark.createDataFrame(data=data,schema=schema)
 df.show()
-
+df_explode=df_c.withColumn('score',explode(col('score')))
 ----------------------------------------4.even numbers-------------------------------------------
 input-
 +---+
