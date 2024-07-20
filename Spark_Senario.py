@@ -1,4 +1,4 @@
-/*You are given a dataframe with columns id, email, sent_date. The email id is a frequently updated column in this dataframe. Your task is to find out latest email of the students based on the most recent update_date */
+1./*You are given a dataframe with columns id, email, sent_date. The email id is a frequently updated column in this dataframe. Your task is to find out latest email of the students based on the most recent update_date */
 
 
 input
@@ -72,7 +72,7 @@ final=df.filter(col('laste_email_id')==1).drop('laste_email_id')
 # Show the final DataFrame
 final.show()
 
----------------------------------------------->fetch the details of employees who are reporting to the same manager<------------------------------------------------
+---------------------------------------------->2.fetch the details of employees who are reporting to the same manager<------------------------------------------------
 
      data = [
  (1,'A',4),
@@ -95,3 +95,36 @@ from pyspark.sql.functions import *
 df=emp_df.groupBy('mgrid').agg(count('mgrid').alias('cnt')).filter(col('cnt')>1)
 df1=df.join(emp_df,df.mgrid==emp_df.mgrid,'inner')
 df1.show()
+
+   ------------------------------->3.second highest salary<--------------------------------
+
+
+   data = [
+    ("John", 1000),
+    ("Doe", 2000),
+    ("Alice", 3000),
+    ("Bob", 4000),
+    ("Charlie", 4000) # Duplicate to test deduplication
+]
+
+# Creating DataFrame
+columns = ["Name", "Salary"]
+
+from pyspark.sql.functions import *
+       
+df = spark.createDataFrame(data, schema=columns)
+df_1=df.select(col('Salary')).distinct()
+df_2=df_1.orderBy(col('Salary').desc())
+df_2.collect()[1][0]
+--------------output:-
+ 3000
+
+-------------------------------->explations of collect<-----------------------
+df_2.collect()
+[Row(Salary=4000), Row(Salary=3000), Row(Salary=2000), Row(Salary=1000)]
+df_2.collect()[1]
+Row(Salary=3000)
+df_2.collect()[0]
+ Row(Salary=4000)
+
+    
