@@ -137,9 +137,7 @@ output-
 from pyspark.sql.types import StructType,StructField, StringType, IntegerType, ArrayType
 data = [(1,), (2,), (3,), (4,), (5,), (6,)]
 schema=StructType([
-StructField("id",IntegerType(),True),\
-
-])
+StructField("id",IntegerType(),True)])
 df=spark.createDataFrame(data=data,schema=schema)
 df.show()
 
