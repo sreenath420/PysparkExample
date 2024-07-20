@@ -18,4 +18,5 @@
 --------------------------------------------->Spark_Senario.py<---------------------------------------------------
 
 2.fetch the details of employees who are reporting to the same manager.
+
 3.second highest salary
