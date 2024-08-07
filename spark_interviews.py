@@ -523,6 +523,40 @@ Function: collect_list(col)
 example:-
 df_with_list = df.groupBy("id").agg(collect_list("fruit").alias("fruits"))
 
+--------------------------------------------->17.PyparkCode<------------------------------------------------------------
+Input:-
+   data = [
+    "text1,text2|text3,text4|text5",
+    "text1,text2|text3,text4|text5",
+    "text1,text2|text3,text4|text5",
+    "text1,text2|text3,text4|text5",
+    "text1,text2|text3,text4|text5",
+    "text1,text2|text3,text4|text5",
+    "text1,text2|text3,text4|text5",
+    "text1,text2|text3,text4|text5"
+]
+output:-
++-----+-----+-----+-----+-----+
+|text1|text2|text3|text4|text5|
++-----+-----+-----+-----+-----+
+|text1|text2|text3|text4|text5|
+|text1|text2|text3|text4|text5|
+|text1|text2|text3|text4|text5|
+|text1|text2|text3|text4|text5|
+|text1|text2|text3|text4|text5|
+|text1|text2|text3|text4|text5|
+|text1|text2|text3|text4|text5|
+|text1|text2|text3|text4|text5|
++-----+-----+-----+-----+-----+
+# Create an RDD from the data
+rdd = spark.sparkContext.parallelize(data)
+
+# Split the data into columns
+rdd_1=rdd.map(lambda x:x.replace('|',',').split(','))
+columns=['text1','text2','text3','text4','text5']
+rd=rdd_1.toDF(columns)
+rd.show()
+
 
 
 
