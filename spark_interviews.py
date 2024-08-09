@@ -588,6 +588,51 @@ df=df.select(col("user.address.city").alias('city'),col("user.address.state").al
 | Hyd|   TL|
 +----+-----+
 
+---------------------------------------------------->bonus less than 1000<-------------------------------------------------------------
+ 
+name and bonus amount of each employee with a bonus less than 1000
+in pyspark
+  
+  input: 
+Employee table:
++-------+--------+------------+--------+
+| empId | name   | supervisor | salary |
++-------+--------+------------+--------+
+| 3     | Brad   | null       | 4000   |
+| 1     | John   | 3          | 1000   |
+| 2     | Dan    | 3          | 2000   |
+| 4     | Thomas | 3          | 4000   |
++-------+--------+------------+--------+
+Bonus table:
++-------+-------+
+| empId | bonus |
++-------+-------+
+| 2     | 500   |
+| 4     | 2000  |
++-------+-------+
+Output: 
++------+-------+
+| name | bonus |
++------+-------+
+| Brad | null  |
+| John | null  |
+| Dan  | 500   |
++------+-------+
+
+
+
+
+employee_data = [(3, "Brad", None, 4000),
+                 (1, "John", 3, 1000),
+                 (2, "Dan", 3, 2000),
+                 (4, "Thomas", 3, 4000)]
+
+bonus_data = [(2, 500),
+              (4, 2000)]
+
+# Create DataFrames
+employee_df = spark.createDataFrame(employee_data, ["empId", "name", "supervisor", "salary"])
+bonus_df = spark.createDataFrame(bonus_data, ["empId", "bonus"])
 
 
 
