@@ -557,7 +557,36 @@ columns=['text1','text2','text3','text4','text5']
 rd=rdd_1.toDF(columns)
 rd.show()
 
+----------------------------------------------------------->Json_Extract<---------------------------------------------------
+  Below json extract city and state 
 
+from pyspark.sql.functions import *
+
+data = [
+    {
+        "user": {
+            "name": "Srikanth",
+            "age": 30,
+            "product": "Book 1",
+            "address": {
+                "city": "Hyd",
+                "state": "TL"
+            }
+        }
+    }
+]
+
+# Create DataFrame
+df = spark.read.json(spark.sparkContext.parallelize(data))
+
+df=df.select(col("user.address.city").alias('city'),col("user.address.state").alias('state'))
+
+
++----+-----+
+|city|state|
++----+-----+
+| Hyd|   TL|
++----+-----+
 
 
 
