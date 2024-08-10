@@ -633,6 +633,10 @@ bonus_data = [(2, 500),
 # Create DataFrames
 employee_df = spark.createDataFrame(employee_data, ["empId", "name", "supervisor", "salary"])
 bonus_df = spark.createDataFrame(bonus_data, ["empId", "bonus"])
-
+employee_df = spark.createDataFrame(employee_data, ["empId", "name", "supervisor", "salary"])
+bonus_df = spark.createDataFrame(bonus_data, ["empId", "bonus"])
+df=employee_df.join(bonus_df,on='empId',how='left')
+df_bonus=df.select('name','bonus').filter((col('bonus')<1000) | col('bonus').isNull())
+df_bonus.show()
 
 
