@@ -640,3 +640,46 @@ df_bonus=df.select('name','bonus').filter((col('bonus')<1000) | col('bonus').isN
 df_bonus.show()
 
 
+
+-------------------------------------------------------->cumlative_sum<---------------------------------------------------------------
+data = [
+    (3000, '22-may'),
+    (5000, '23-may'),
+    (8000, '25-may'),
+    (10000, '22-june'),
+    (12500, '3-july')
+]
+from pyspark.sql.types import StructType, StructField, IntegerType, StringType
+
+schema = StructType([
+    StructField("revenue", IntegerType(), True),
+    StructField("date", StringType(), True)
+])
+
+output:-
+|revenue|   date|month|  rev|
++-------+-------+-----+-----+
+|  12500| 3-july| july|12500|
+|  10000|22-june| june|10000|
+|   3000| 22-may|  may| 3000|
+|   5000| 23-may|  may| 8000|
+|   8000| 25-may|  may|16000|
+
+soluation:-
+	from pyspark.sql import SparkSession
+spark = SparkSession.builder.appName("Create DataFrame").getOrCreate()
+
+# Create DataFrame
+df = spark.createDataFrame(data, schema)
+
+# Show the DataFrame
+df.show()
+
+from pyspark.sql.window import *
+window_fun=Window.partitionBy('month').rowsBetween(Window.unboundedPreceding, Window.currentRow)
+df=df.withColumn('rev',sum(col('revenue')).over(window_fun))
+df.show()
+
+
+
+----------------
