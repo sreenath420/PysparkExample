@@ -682,4 +682,48 @@ df.show()
 
 
 
-----------------
+--------------------------------------->total_sales<------------------------------------------
+
+
+  from pyspark.sql import SparkSession
+from pyspark.sql.functions import col, sum as spark_sum, rank
+from pyspark.sql.window import Window
+
+# Initialize Spark session
+spark = SparkSession.builder.appName("CustomerSalesRanking").getOrCreate()
+
+# Define the schema and data
+columns = ["transaction_id", "customer_id", "product_id", "quantity", "price", "transaction_date"]
+data = [
+    (1, 101, 1001, 2, 50.0, '2024-01-01'),
+    (2, 102, 1002, 1, 30.0, '2024-01-02'),
+    (3, 101, 1003, 3, 20.0, '2024-01-03'),
+    (4, 103, 1001, 1, 50.0, '2024-01-04'),
+    (5, 102, 1002, 2, 30.0, '2024-01-05')
+]
+
+# Create a DataFrame
+df = spark.createDataFrame(data, schema=columns)
+
+# Calculate total sales for each transaction (quantity * price)
+df = df.withColumn("total_sales", col("quantity") * col("price"))
+
+# Group by customer_id and calculate total sales per customer
+customer_sales = df.groupBy("customer_id").agg(spark_sum("total_sales").alias("total_sales"))
+
+# Define a window for ranking, ordered by total_sales in descending order
+window_spec = Window.orderBy(col("total_sales").desc())
+
+# Add a rank column based on total sales
+customer_sales = customer_sales.withColumn("rank", rank().over(window_spec))
+
+# Show the final ranked customer sales
+customer_sales.show()
++-----------+-----------+----+
+|customer_id|total_sales|rank|
++-----------+-----------+----+
+|        101|      160.0|   1|
+|        102|       90.0|   2|
+|        103|       50.0|   3|
++-----------+-----------+----+
+
