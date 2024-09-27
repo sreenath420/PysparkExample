@@ -557,7 +557,7 @@ columns=['text1','text2','text3','text4','text5']
 rd=rdd_1.toDF(columns)
 rd.show()
 
------------------------------------------------------------>Json_Extract<---------------------------------------------------
+----------------------------------------------------------->18.Json_Extract<---------------------------------------------------
   Below json extract city and state 
 
 from pyspark.sql.functions import *
@@ -588,7 +588,7 @@ df=df.select(col("user.address.city").alias('city'),col("user.address.state").al
 | Hyd|   TL|
 +----+-----+
 
----------------------------------------------------->bonus less than 1000<-------------------------------------------------------------
+---------------------------------------------------->19.bonus less than 1000<-------------------------------------------------------------
  
 name and bonus amount of each employee with a bonus less than 1000
 in pyspark
@@ -641,7 +641,7 @@ df_bonus.show()
 
 
 
--------------------------------------------------------->cumlative_sum<---------------------------------------------------------------
+-------------------------------------------------------->20.cumlative_sum<---------------------------------------------------------------
 data = [
     (3000, '22-may'),
     (5000, '23-may'),
@@ -682,7 +682,7 @@ df.show()
 
 
 
---------------------------------------->total_sales<------------------------------------------
+--------------------------------------->22.total_sales<------------------------------------------
 
 
   from pyspark.sql import SparkSession
@@ -726,4 +726,16 @@ customer_sales.show()
 |        102|       90.0|   2|
 |        103|       50.0|   3|
 +-----------+-----------+----+
+
+------------------------------------------------23.find the most most occurence in given textfile <----------------------------------------------
+
+
+from pyspark.sql.functions import split,explode,col
+df=spark.read.text("dbfs:/FileStore/smaple_txt.txt")
+df_word=df.selectExpr("explode(split(lower(value),' ')) as word") 
+df_word=df_word.groupBy('word').count()
+df_word=df_word.orderBy(col('count').desc())
+df_word.show(1)
+
+
 
