@@ -18,9 +18,8 @@ limit –an integer that controls the number of times pattern is applied.
 Note:  Spark 3.0 split() function takes an optional limit field. If not provided, the default limit value is -1.
 
 
-Before we start with an example of PySpark split function, first let’s create a DataFrame and will use one of the column from this DataFrame to split into multiple columns.
-
-data=data = [('James','','Smith','1991-04-01'),
+Before we start with an example of PySpark split function, first let’s create a DataFrame and will use one of the column from this DataFrame to split into multiple colu
+data = [('James','','Smith','1991-04-01'),
   ('Michael','Rose','','2000-05-19'),
   ('Robert','','Williams','1978-09-05'),
   ('Maria','Anne','Jones','1967-12-01'),
