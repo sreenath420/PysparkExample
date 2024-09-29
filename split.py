@@ -31,8 +31,8 @@ df=spark.createDataFrame(data,columns)
 
 from pyspark.sql.functions import split
 df=df.withColumn('year',split(df['dob'],'-').getItem(0))\
-  .withColumn('month',split(df['dob'],'-').getItem(1))\
-  .withColumn('day',split(df['dob'],'-').getItem(2))
+      .withColumn('month',split(df['dob'],'-').getItem(1))\
+      .withColumn('day',split(df['dob'],'-').getItem(2))
 
 df.show()
 output:-
