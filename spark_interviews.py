@@ -738,4 +738,53 @@ df_word=df_word.orderBy(col('count').desc())
 df_word.show(1)
 
 
+---------------------------------------->24.<------------------------------------------------------
+
+input
+names   dob
+A     1-1/1900
+B	  1\2/1900
+C	  1-3/1900
+D	  1\4\1900
+
+
+output
+dob        month  day  year
+1-1/1900   1      1    1900
+1\2/1900   1	  2    1900
+1-3/1900   1      3    1900
+1\4\1900   1      4    1900
+
+
+from pyspark.sql import SparkSession
+from pyspark.sql.functions import regexp_replace,split,col
+
+# Create Spark session
+spark = SparkSession.builder.appName("regexp_replace_example").getOrCreate()
+
+data = [("A", "1-1/1900"), 
+        ("B", "1\\2/1900"), 
+        ("C", "1-3/1900"), 
+        ("D", "1\\4\\1900")]
+
+df = spark.createDataFrame(data, ["names", "dob"])
+------------------------------------------------------>regexp_replace<-------------------------------------------------------
+In PySpark, the regexp_replace function is used to replace substrings that match a regular expression with a specified string. It's commonly used to clean or standardize data, like converting all occurrences of a backslash (\) to a hyphen (-) in a column of strings
+
+syntax:-
+
+regexp_replace(column, pattern, replacement)
+
+
+
+
+df1=df.withColumn('dob',regexp_replace(col('dob'),r'\\','-'))
+
+
+df1=df1.withColumn('data_split',split(col('dob'),'[-/]'))
+df2=df1.withColumn('month',col('data_split')[0]).\
+        withColumn('day',col('data_split')[1]).\
+        withColumn('year',col('data_split')[2])
+
+df2.select('month','day','year').show()
 
