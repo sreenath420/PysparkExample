@@ -808,3 +808,54 @@ df_unique = df.dropDuplicates(["id"])
 
 # Show the result
 df_unique.show()
+
+
+--------------------------------------------------------------->26<--------------------------------------------------------------
+input:-
+	   
+(101, "Alice", 15000, "D1", "111111"),
+    (102, "Bob", 10000, "D1", "222222"),
+    (103, "James", 8000, "D2", "333333"),
+    (104, "George", 12000, "D2", "444444, 555555"),
+    (105, "Kate", 10000, "D1", "666666")
+
+output:-
+
++-------+--------+----------+-----------+----------+
+| emp_id|emp_name|emp_salary|emp_dept_id|emp_contact|
++-------+--------+----------+-----------+----------+
+| 101   | Alice  | 15000    | D1        | 111111   |
+| 102   | Bob    | 10000    | D1        | 222222   |
+| 103   | James  | 8000     | D2        | 333333   |
+| 104   | George | 12000    | D2        | 444444   |
+| 104   | George | 12000    | D2        | 555555   |
+| 105   | Kate   | 10000    | D1        | 666666   |
++-------+--------+----------+-----------+----------+
+
+
+from pyspark.sql import SparkSession
+from pyspark.sql.functions import split, explode
+
+# Initialize a Spark session
+spark = SparkSession.builder.appName("EmployeeContacts").getOrCreate()
+
+# Sample data
+data = [
+    (101, "Alice", 15000, "D1", "111111"),
+    (102, "Bob", 10000, "D1", "222222"),
+    (103, "James", 8000, "D2", "333333"),
+    (104, "George", 12000, "D2", "444444, 555555"),
+    (105, "Kate", 10000, "D1", "666666")
+]
+
+# Define the schema
+columns = ["emp_id", "emp_name", "emp_salary", "emp_dept_id", "emp_contact"]
+
+# Create a DataFrame
+df = spark.createDataFrame(data, columns)
+
+# Split the 'emp_contact' column by comma and explode it into multiple rows
+df = df.withColumn("emp_contact", explode(split(df["emp_contact"], ", ")))
+
+# Show the result
+df.show(truncate=False)
