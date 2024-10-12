@@ -768,7 +768,7 @@ data = [("A", "1-1/1900"),
         ("D", "1\\4\\1900")]
 
 df = spark.createDataFrame(data, ["names", "dob"])
------------------------------------------------------->regexp_replace<-------------------------------------------------------
+------------------------------------------------------>24.regexp_replace<-------------------------------------------------------
 In PySpark, the regexp_replace function is used to replace substrings that match a regular expression with a specified string. It's commonly used to clean or standardize data, like converting all occurrences of a backslash (\) to a hyphen (-) in a column of strings
 
 syntax:-
@@ -788,3 +788,23 @@ df2=df1.withColumn('month',col('data_split')[0]).\
 
 df2.select('month','day','year').show()
 
+--------------------------------------------->25.Drop duplicates in pyspark<----------------------------------------------
+
+
+from pyspark.sql import SparkSession
+
+# Create a Spark session
+spark = SparkSession.builder.appName("RemoveDuplicates").getOrCreate()
+
+# Sample data
+data = [(1,), (1,), (1,), (2,), (3,), (4,)]
+columns = ["id"]
+
+# Create a DataFrame
+df = spark.createDataFrame(data, columns)
+
+# Remove duplicates
+df_unique = df.dropDuplicates(["id"])
+
+# Show the result
+df_unique.show()
