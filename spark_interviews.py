@@ -7,7 +7,7 @@ id name amout
 
 
 id   A      B
-1    80    80
+1    80     80
 2    0      30
 
 how to write code by using dataframes
