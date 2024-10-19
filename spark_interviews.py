@@ -859,3 +859,9 @@ df = df.withColumn("emp_contact", explode(split(df["emp_contact"], ", ")))
 
 # Show the result
 df.show(truncate=False)
+-------------------------------->how to handle bad records<-------------------------------------
+  data=[('a','b','c'),('m','n','p','q','r'),('q','e'),('z','e','r')]
+rdd=spark.sparkContext.parallelize(data)
+filter_rdd=rdd.filter(lambda x:len(x)==3)
+filter_rdd_bad=rdd.filter(lambda x:len(x)<3)
+result=filter_rdd.collect()
