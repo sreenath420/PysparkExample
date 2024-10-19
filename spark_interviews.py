@@ -865,3 +865,28 @@ rdd=spark.sparkContext.parallelize(data)
 filter_rdd=rdd.filter(lambda x:len(x)==3)
 filter_rdd_bad=rdd.filter(lambda x:len(x)<3)
 result=filter_rdd.collect()
+
+
+----------------->Using a Loop for Multiple Paths<-------------------
+
+      from pyspark.sql import SparkSession
+
+# Create a Spark session
+spark = SparkSession.builder.appName("ReadMultipleFiles").getOrCreate()
+
+# List of file paths
+file_paths = ["path/to/your/file1.csv", "path/to/your/file2.csv", "path/to/your/file3.csv"]
+
+# Initialize an empty DataFrame
+df = None
+
+# Loop through the file paths and read each into the DataFrame
+for path in file_paths:
+    if df is None:
+        df = spark.read.option("header", "true").csv(path)
+    else:
+        new_df = spark.read.option("header", "true").csv(path)
+        df = df.union(new_df)
+
+# Show the combined DataFrame
+df.show()
