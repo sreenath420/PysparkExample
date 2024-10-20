@@ -146,13 +146,13 @@ df1.show()
 --------------------------..................5.word count------------------------------------------
 Input-
 This is SreeNath
-This is Ujjwala
+This is John
 Output-
 (This,2)
 (is,2)
 (SreeNath,1)
-(Ujjwala,1)
-data = ["This is SreeNath", "This is Ujjwala"]
+(John,1)
+data = ["This is SreeNath", "This is John"]
 rdd =sc.parallelize(data)
 counts=rdd.flatMap(lambda line: line.split(" ")) \
                             .map(lambda word: (word, 1)) \
@@ -160,7 +160,7 @@ counts=rdd.flatMap(lambda line: line.split(" ")) \
 ##word_tuples_rdd.reduceByKey(lambda a, b: a + b)
 
 counts.collect()
-[('This', 2), ('SreeNath', 1), ('is', 2), ('Ujjwala', 1)]   
+[('This', 2), ('SreeNath', 1), ('is', 2), ('John', 1)]   
    
 ----------------------------------------------------------------->6.Collect_list<-----------------------------------------------------
  Input     +----+-----+----+----------------------------
