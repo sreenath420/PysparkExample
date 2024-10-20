@@ -768,7 +768,6 @@ data = [("A", "1-1/1900"),
         ("D", "1\\4\\1900")]
 
 df = spark.createDataFrame(data, ["names", "dob"])
------------------------------------------------------->24.regexp_replace<-------------------------------------------------------
 In PySpark, the regexp_replace function is used to replace substrings that match a regular expression with a specified string. It's commonly used to clean or standardize data, like converting all occurrences of a backslash (\) to a hyphen (-) in a column of strings
 
 syntax:-
