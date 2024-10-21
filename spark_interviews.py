@@ -858,7 +858,7 @@ df = df.withColumn("emp_contact", explode(split(df["emp_contact"], ", ")))
 
 # Show the result
 df.show(truncate=False)
--------------------------------->how to handle bad records<-------------------------------------
+-------------------------------->27.how to handle bad records<-------------------------------------
   data=[('a','b','c'),('m','n','p','q','r'),('q','e'),('z','e','r')]
 rdd=spark.sparkContext.parallelize(data)
 filter_rdd=rdd.filter(lambda x:len(x)==3)
@@ -889,3 +889,13 @@ for path in file_paths:
 
 # Show the combined DataFrame
 df.show()
+------------------------------>28.upsert and insert logic in databricks<--------------------------------------------
+you provided performs a merge operation that updates existing records and inserts new ones in the customers table based on the new_customers table.
+
+merge into customers as Target
+using new_customers as Source
+on target.customer_id=source.customer_id
+when matched then 
+update set target.name=source.name , target.email=source.email
+when not matched then
+insert(customer_id,name,email) VALUES(source.customer_id,source.name,source.email);
