@@ -899,3 +899,39 @@ when matched then
 update set target.name=source.name , target.email=source.email
 when not matched then
 insert(customer_id,name,email) VALUES(source.customer_id,source.name,source.email);
+
+------------------------------------------->29<----------------------------------------
+
+json file:
+{"dept_id":101,"e_id":[10101,10102,10103]}
+{"dept_id":102,"e_id:[10201,10202]"}
+ 
+output:
+dept_id,e_id
+101    10101
+101    10102
+101    10103
+102    10201
+102    10202
+
+from pyspark.sql import SparkSession
+from pyspark.sql.functions import explode
+
+# Initialize Spark session
+spark = SparkSession.builder.appName("json_processing").getOrCreate()
+
+# Load the JSON file
+json_file = "path/to/json_file.json"
+
+# Read the JSON file into a DataFrame
+df = spark.read.json(json_file)
+
+# Explode the 'e_id' array so that each element gets its own row
+df_exploded = df.withColumn("e_id", explode(df["e_id"]))
+
+# Select the desired columns and show the result
+df_exploded.select("dept_id", "e_id").show(truncate=False)
+
+# Optional: You can also write the result to a CSV file if needed
+# df_exploded.select("dept_id", "e_id").write.csv("output_path.csv")
+
