@@ -935,3 +935,36 @@ df_exploded.select("dept_id", "e_id").show(truncate=False)
 # Optional: You can also write the result to a CSV file if needed
 # df_exploded.select("dept_id", "e_id").write.csv("output_path.csv")
 
+
+---------------------->10th highest salary<----------------------------------
+
+from pyspark.sql import SparkSession
+from pyspark.sql.functions import col
+from pyspark.sql.window import Window
+from pyspark.sql.functions import dense_rank
+spark = SparkSession.builder.appName("10th Highest Salary").getOrCreate()
+data = [
+    ("Alice", 5000),
+    ("Bob", 6000),
+    ("Charlie", 7000),
+    ("David", 8000),
+    ("Eve", 9000),
+    ("Frank", 10000),
+    ("Grace", 11000),
+    ("Heidi", 12000),
+    ("Ivan", 13000),
+    ("Judy", 14000),
+    ("Kevin", 15000),
+    ("Laura", 16000)
+]
+
+df = spark.createDataFrame(data, columns)
+WindowSpec=Window.orderBy(col("salary").desc())
+df=df.withColumn('rank',dense_rank().over(WindowSpec))
+df.filter("rank==10").show()
++-------+------+----+
+|   name|salary|rank|
++-------+------+----+
+|Charlie|  7000|  10|
++-------+------+----+
+
