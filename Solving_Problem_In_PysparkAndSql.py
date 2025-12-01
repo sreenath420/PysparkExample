@@ -42,7 +42,45 @@ transaction_id
 
 
 
----->Pyspark_code<-----
+------>Pyspark_code<----
+
+data = [
+  [101, "2024-06-01", 49.99, 1001],
+  [101, "2024-06-03", 49.00, 1002],
+  [101, "2024-06-04", 49.0, 1003],
+  [102, "2024-06-02", 50.99, 1001],
+  [102, "2024-06-04", 49.99, 1002],
+  [103, "2024-06-02", 69.99, 1001],
+  [103, "2024-06-04", 9.99, 1002]
+]
+
+columns = [
+  "customer_id",
+  "purchase_date",
+  "amount",
+  "transaction_id"
+]
+
+df_data = spark.createDataFrame(
+  data,
+  columns
+)
+
+
+
+
+from pyspark.sql.window import Window
+from pyspark.sql.functions import *
+df=Window.partitionBy("customer_id").orderBy(asc("purchase_date")).orderBy(asc("transaction_id"))
+
+df_window=df_data.withColumn("rnk",row_number().over(df))
+
+df_window.filter(col("rnk")==1).drop("rnk").show()
+
+
+
+
+
 
 
 
