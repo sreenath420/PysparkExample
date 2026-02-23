@@ -174,16 +174,76 @@ merged_df.show()
 ----->How Incremental Solves this problem why we need to do this<---------------------------
 
 
-=================>Problem
+updated records by incrementally
 
-Target table = Very large (imagine 200M rows)
+Why Watermark Is Powerful
 
-Source table = Smaller (10M rows)
+Without watermark:
 
-We don’t want full-table comparison
+Scan full 10M source
 
-We will:
+Join full target
 
-✅ Process only changed / new data
-✅ Avoid scanning full target
-✅ Use incremental logic
+Heavy shuffle
+
+With watermark:
+
+Scan only new rows
+
+Join only few IDs
+
+Minimal shuffle
+
+
+from pyspark.sql import SparkSession
+from pyspark.sql.functions import col, max as spark_max
+from datetime import datetime
+
+spark = SparkSession.builder.appName("IncrementalStepByStep").getOrCreate()
+
+target_data = [
+    (1, "Alice", 50000, datetime(2024,1,10,10,0)),
+    (2, "Bob", 60000, datetime(2024,1,12,12,0))
+]
+
+columns = ["id", "name", "salary", "last_updated"]
+
+target_df = spark.createDataFrame(target_data, columns)
+
+print("Existing Target Data")
+target_df.show(truncate=False)
+
+
+source_data = [
+    (1, "Alice", 50000, datetime(2024,1,10,10,0)),  # old
+    (2, "Bob", 65000, datetime(2024,1,18,15,0)),    # updated
+    (3, "Charlie", 70000, datetime(2024,1,20,9,0))  # new
+]
+
+source_df = spark.createDataFrame(source_data, columns)
+
+print("Incoming Source Data")
+source_df.show(truncate=False)
+
+----> here the condition we make update date for implement that logic<-------------------------------
+last_updated_ts=datetime(2024,1,15,0,0)
+print("Last Processed WaterMark",last_updated_ts)
+
+
+
+incremental_df=source_df.filter(col("last_updated")>last_updated_ts)
+incremental_df.show()
+
+
+updated_records=incremental_df.alias("s").join(target_df.alias("t"),on='id',how='inner').filter(col("s.salary") != col("t.salary")).select("s.*")
+updated_records.show()
+
+new_records=incremental_df.join(target_df,on='id',how='leftanti')
+new_records.show()
+
+existing_records=target_df.join(incremental_df,on='id',how='leftanti')
+existing_records.show()
+
+
+final_df=existing_records.unionByName(incremental_df).unionByName(updated_records)
+final_df.show()
