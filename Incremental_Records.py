@@ -108,3 +108,63 @@ print("Final Table After Upsert")
 final_df.show()
 
 
+
+--------------->insert new_records and update existing records and remove dupicateds and handing null values<-----------
+
+
+Step 1: Create Data
+
+from pyspark.sql import SparkSession
+from pyspark.sql.functions import col, row_number
+from pyspark.sql.window import Window
+
+spark = SparkSession.builder.appName("SimpleUpsertPractice").getOrCreate()
+
+# Target data
+target_data = [
+    (1, "Alice", "HR", 50000),
+    (2, "Bob", "IT", 60000)
+]
+
+# Source data (duplicate id=2)
+source_data = [
+    (2, "Bob", "IT", 62000),
+    (2, "Bob", "IT", 65000),  # latest
+    (3, "Charlie", "Finance", 70000)
+]
+
+columns = ["id", "name", "department", "salary"]
+
+target_df = spark.createDataFrame(target_data, columns)
+source_df = spark.createDataFrame(source_data, columns)
+
+print("Target Table")
+target_df.show()
+
+print("Source Table (With Duplicates)")
+source_df.show()
+
+
+Step 2: Handle Duplicate IDs in Source
+
+Window=Window.partitionBy("id").orderBy(col("salary").desc())
+source_df=source_df.withColumn("rnk",row_number().over(Window)).\
+    filter(col("rnk")==1).drop("rnk")
+    
+ Step 3: Find Updates
+updates=source_df.alias("s").join(target_df.alias("t"),on="id",how="inner")
+updates=updates.selectExpr("s.id","coalesce(s.name,t.name) as name","coalesce(s.department,t.department) as department","coalesce(s.salary,t.salary) as salary")
+
+updates.show()
+
+Step 4: Find Inserts 
+new_records=source_df.join(target_df,on="id",how="leftanti")
+new_records.show()
+
+Step 5: Remove Old Records from Target
+old_records=target_df.join(updates,on="id",how="leftanti")
+old_records.show()
+
+Step 6: Final Upsert Result
+merged_df=old_records.union(updates).union(new_records)
+merged_df.show()
