@@ -168,3 +168,22 @@ old_records.show()
 Step 6: Final Upsert Result
 merged_df=old_records.union(updates).union(new_records)
 merged_df.show()
+
+
+
+----->How Incremental Solves this problem why we need to do this<---------------------------
+
+
+=================>Problem
+
+Target table = Very large (imagine 200M rows)
+
+Source table = Smaller (10M rows)
+
+We don’t want full-table comparison
+
+We will:
+
+✅ Process only changed / new data
+✅ Avoid scanning full target
+✅ Use incremental logic
